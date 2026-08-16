@@ -1,0 +1,1037 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>SkillShareJR — Life City</title>
+
+<style>
+
+/* =========================
+   RESET
+========================= */
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    overflow: hidden;
+    font-family: Arial, sans-serif;
+    background: #050816;
+    color: white;
+}
+
+
+/* =========================
+   GAME UI
+========================= */
+
+#ui {
+    position: fixed;
+    top: 0;
+    left: 0;
+
+    width: 100%;
+
+    padding: 18px 25px;
+
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    background: rgba(5,8,22,0.75);
+
+    backdrop-filter: blur(12px);
+
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+
+    z-index: 20;
+}
+
+.logo {
+    font-size: 22px;
+    font-weight: 900;
+}
+
+.logo span {
+    color: #29d9ff;
+}
+
+.stats {
+    display: flex;
+    gap: 25px;
+}
+
+.stat {
+    color: #b8c4d8;
+}
+
+.stat strong {
+    color: #29d9ff;
+}
+
+
+/* =========================
+   GAME WORLD
+========================= */
+
+#game {
+    position: relative;
+
+    width: 100vw;
+    height: 100vh;
+
+    overflow: hidden;
+
+    background:
+        radial-gradient(
+            circle at 50% 40%,
+            #172b63 0%,
+            #080d25 45%,
+            #02030a 100%
+        );
+}
+
+
+/* =========================
+   GRID
+========================= */
+
+#grid {
+    position: absolute;
+
+    width: 200%;
+    height: 200%;
+
+    left: -50%;
+    top: -35%;
+
+    background-image:
+        linear-gradient(
+            rgba(41,217,255,0.12) 1px,
+            transparent 1px
+        ),
+        linear-gradient(
+            90deg,
+            rgba(41,217,255,0.12) 1px,
+            transparent 1px
+        );
+
+    background-size: 70px 70px;
+
+    transform:
+        perspective(500px)
+        rotateX(60deg);
+
+    transform-origin: center;
+}
+
+
+/* =========================
+   CITY BUILDINGS
+========================= */
+
+.building {
+
+    position: absolute;
+
+    width: 170px;
+    height: 150px;
+
+    border-radius: 20px;
+
+    display: flex;
+    flex-direction: column;
+
+    justify-content: center;
+    align-items: center;
+
+    text-align: center;
+
+    background:
+        linear-gradient(
+            145deg,
+            rgba(42,62,120,0.9),
+            rgba(8,15,40,0.95)
+        );
+
+    border: 2px solid rgba(41,217,255,0.35);
+
+    box-shadow:
+        0 0 30px rgba(41,217,255,0.12),
+        inset 0 0 30px rgba(41,217,255,0.05);
+
+    transition: 0.3s;
+
+    cursor: pointer;
+
+    z-index: 4;
+}
+
+.building:hover {
+
+    transform:
+        translateY(-10px)
+        scale(1.05);
+
+    border-color: #29d9ff;
+
+    box-shadow:
+        0 0 40px rgba(41,217,255,0.4);
+}
+
+.building .icon {
+    font-size: 45px;
+    margin-bottom: 10px;
+}
+
+.building h2 {
+    font-size: 18px;
+}
+
+.building p {
+    color: #8fa4c7;
+    font-size: 12px;
+    margin-top: 5px;
+}
+
+
+/* =========================
+   BUILDING POSITIONS
+========================= */
+
+#bank {
+    left: 12%;
+    top: 28%;
+}
+
+#time {
+    right: 12%;
+    top: 28%;
+}
+
+#team {
+    left: 14%;
+    bottom: 18%;
+}
+
+#mind {
+    right: 14%;
+    bottom: 18%;
+}
+
+
+/* =========================
+   PLAYER
+========================= */
+
+#player {
+
+    position: absolute;
+
+    width: 45px;
+    height: 55px;
+
+    left: 50%;
+    top: 55%;
+
+    transform: translate(-50%, -50%);
+
+    z-index: 10;
+
+    transition: left 0.08s linear, top 0.08s linear;
+}
+
+.head {
+
+    width: 30px;
+    height: 30px;
+
+    border-radius: 50%;
+
+    background: #ffd7b3;
+
+    margin: auto;
+}
+
+.body {
+
+    width: 38px;
+    height: 30px;
+
+    background:
+        linear-gradient(
+            90deg,
+            #29d9ff,
+            #2563ff
+        );
+
+    border-radius: 12px 12px 7px 7px;
+
+    margin: -2px auto 0;
+}
+
+.player-shadow {
+
+    width: 55px;
+    height: 15px;
+
+    border-radius: 50%;
+
+    background: rgba(0,0,0,0.5);
+
+    position: absolute;
+
+    bottom: -7px;
+    left: -5px;
+
+    filter: blur(5px);
+
+    z-index: -1;
+}
+
+
+/* =========================
+   INSTRUCTIONS
+========================= */
+
+#instructions {
+
+    position: fixed;
+
+    bottom: 20px;
+    left: 50%;
+
+    transform: translateX(-50%);
+
+    padding: 12px 20px;
+
+    background: rgba(5,8,22,0.85);
+
+    border: 1px solid rgba(41,217,255,0.25);
+
+    border-radius: 30px;
+
+    color: #9eb0cc;
+
+    z-index: 20;
+
+    text-align: center;
+
+    font-size: 13px;
+}
+
+
+/* =========================
+   MODAL
+========================= */
+
+#modal {
+
+    display: none;
+
+    position: fixed;
+
+    inset: 0;
+
+    background: rgba(0,0,0,0.7);
+
+    backdrop-filter: blur(10px);
+
+    z-index: 100;
+
+    align-items: center;
+    justify-content: center;
+}
+
+.modal-box {
+
+    width: min(600px, 90%);
+
+    padding: 35px;
+
+    border-radius: 25px;
+
+    background:
+        linear-gradient(
+            145deg,
+            #101a3c,
+            #070b1c
+        );
+
+    border: 1px solid rgba(41,217,255,0.3);
+
+    box-shadow:
+        0 0 80px rgba(41,217,255,0.15);
+
+    text-align: center;
+}
+
+.modal-box h1 {
+
+    font-size: 35px;
+
+    margin-bottom: 15px;
+}
+
+.modal-box p {
+
+    color: #a7b5cb;
+
+    line-height: 1.6;
+
+    margin-bottom: 25px;
+}
+
+.choice {
+
+    width: 100%;
+
+    padding: 15px;
+
+    margin: 7px 0;
+
+    border-radius: 12px;
+
+    border: 1px solid rgba(255,255,255,0.1);
+
+    background: rgba(255,255,255,0.05);
+
+    color: white;
+
+    cursor: pointer;
+
+    font-size: 15px;
+
+    transition: 0.2s;
+}
+
+.choice:hover {
+
+    background: rgba(41,217,255,0.12);
+
+    border-color: #29d9ff;
+}
+
+.close {
+
+    margin-top: 20px;
+
+    padding: 10px 20px;
+
+    border-radius: 10px;
+
+    border: none;
+
+    background: #2563ff;
+
+    color: white;
+
+    cursor: pointer;
+}
+
+
+/* =========================
+   MOBILE
+========================= */
+
+@media(max-width:700px) {
+
+    .stats {
+        gap: 10px;
+        font-size: 12px;
+    }
+
+    .building {
+        width: 125px;
+        height: 120px;
+    }
+
+    .building .icon {
+        font-size: 32px;
+    }
+
+    .building h2 {
+        font-size: 14px;
+    }
+
+    #bank {
+        left: 4%;
+        top: 25%;
+    }
+
+    #time {
+        right: 4%;
+        top: 25%;
+    }
+
+    #team {
+        left: 4%;
+        bottom: 20%;
+    }
+
+    #mind {
+        right: 4%;
+        bottom: 20%;
+    }
+}
+
+</style>
+</head>
+
+
+<body>
+
+
+<!-- =========================
+     TOP UI
+========================= -->
+
+<div id="ui">
+
+    <div class="logo">
+        SkillShare<span>JR</span>
+    </div>
+
+    <div class="stats">
+
+        <div class="stat">
+            ⭐ XP:
+            <strong id="xp">0</strong>
+        </div>
+
+        <div class="stat">
+            🏆 Level:
+            <strong id="level">1</strong>
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- =========================
+     GAME
+========================= -->
+
+<div id="game">
+
+    <div id="grid"></div>
+
+
+    <!-- BANK -->
+
+    <div
+        class="building"
+        id="bank"
+        onclick="openChallenge('money')">
+
+        <div class="icon">🏦</div>
+
+        <h2>Money Bank</h2>
+
+        <p>Financial Skills</p>
+
+    </div>
+
+
+    <!-- TIME -->
+
+    <div
+        class="building"
+        id="time"
+        onclick="openChallenge('time')">
+
+        <div class="icon">⏰</div>
+
+        <h2>Time Center</h2>
+
+        <p>Time Management</p>
+
+    </div>
+
+
+    <!-- TEAMWORK -->
+
+    <div
+        class="building"
+        id="team"
+        onclick="openChallenge('team')">
+
+        <div class="icon">🤝</div>
+
+        <h2>Team HQ</h2>
+
+        <p>Teamwork</p>
+
+    </div>
+
+
+    <!-- MINDSET -->
+
+    <div
+        class="building"
+        id="mind"
+        onclick="openChallenge('mind')">
+
+        <div class="icon">🧠</div>
+
+        <h2>Mind Center</h2>
+
+        <p>Mindset</p>
+
+    </div>
+
+
+    <!-- PLAYER -->
+
+    <div id="player">
+
+        <div class="head"></div>
+
+        <div class="body"></div>
+
+        <div class="player-shadow"></div>
+
+    </div>
+
+</div>
+
+
+<!-- =========================
+     INSTRUCTIONS
+========================= -->
+
+<div id="instructions">
+
+    🎮 Move with WASD or Arrow Keys • Walk into a building or click it to learn a skill
+
+</div>
+
+
+<!-- =========================
+     CHALLENGE MODAL
+========================= -->
+
+<div id="modal">
+
+    <div class="modal-box">
+
+        <h1 id="modalTitle">
+            Life Skill Challenge
+        </h1>
+
+        <p id="question">
+            Question
+        </p>
+
+        <div id="choices"></div>
+
+        <button
+            class="close"
+            onclick="closeModal()">
+
+            Return to City
+
+        </button>
+
+    </div>
+
+</div>
+
+
+<script>
+
+/* =========================
+   PLAYER MOVEMENT
+========================= */
+
+const player =
+    document.getElementById("player");
+
+let playerX = window.innerWidth / 2;
+let playerY = window.innerHeight * 0.55;
+
+const speed = 5;
+
+const keys = {};
+
+
+document.addEventListener("keydown", function(event) {
+
+    keys[event.key.toLowerCase()] = true;
+
+});
+
+
+document.addEventListener("keyup", function(event) {
+
+    keys[event.key.toLowerCase()] = false;
+
+});
+
+
+function movePlayer() {
+
+    if (
+        keys["w"] ||
+        keys["arrowup"]
+    ) {
+        playerY -= speed;
+    }
+
+    if (
+        keys["s"] ||
+        keys["arrowdown"]
+    ) {
+        playerY += speed;
+    }
+
+    if (
+        keys["a"] ||
+        keys["arrowleft"]
+    ) {
+        playerX -= speed;
+    }
+
+    if (
+        keys["d"] ||
+        keys["arrowright"]
+    ) {
+        playerX += speed;
+    }
+
+
+    /* Keep player inside screen */
+
+    playerX =
+        Math.max(
+            25,
+            Math.min(
+                window.innerWidth - 25,
+                playerX
+            )
+        );
+
+    playerY =
+        Math.max(
+            100,
+            Math.min(
+                window.innerHeight - 40,
+                playerY
+            )
+        );
+
+
+    player.style.left =
+        playerX + "px";
+
+    player.style.top =
+        playerY + "px";
+
+
+    requestAnimationFrame(movePlayer);
+
+}
+
+
+movePlayer();
+
+
+/* =========================
+   XP SYSTEM
+========================= */
+
+let xp = 0;
+
+let level = 1;
+
+
+function addXP(amount) {
+
+    xp += amount;
+
+    level =
+        Math.floor(xp / 100) + 1;
+
+    document.getElementById("xp")
+        .textContent = xp;
+
+    document.getElementById("level")
+        .textContent = level;
+
+}
+
+
+/* =========================
+   CHALLENGES
+========================= */
+
+const challenges = {
+
+    money: {
+
+        title: "💰 Money Challenge",
+
+        question:
+        "You receive ₹1,000. What is the smartest approach?",
+
+        choices: [
+
+            {
+                text:
+                "Spend all ₹1,000 immediately",
+
+                xp: 5,
+
+                message:
+                "It's important to enjoy money sometimes, but spending everything leaves no room for future needs."
+            },
+
+            {
+                text:
+                "Save some, spend responsibly and keep an emergency amount",
+
+                xp: 25,
+
+                message:
+                "Excellent! Planning, saving and responsible spending are important money skills."
+            },
+
+            {
+                text:
+                "Give away all ₹1,000",
+
+                xp: 10,
+
+                message:
+                "Helping others can be great, but you should also consider your own needs and responsibilities."
+            }
+
+        ]
+
+    },
+
+
+    time: {
+
+        title: "⏰ Time Challenge",
+
+        question:
+        "You have a test tomorrow. Your friends invite you to play. What should you do?",
+
+        choices: [
+
+            {
+                text:
+                "Play all evening and ignore the test",
+
+                xp: 5,
+
+                message:
+                "Fun is important, but ignoring an important responsibility can create problems."
+            },
+
+            {
+                text:
+                "Study first, then make time for some recreation",
+
+                xp: 25,
+
+                message:
+                "Great! Balancing responsibilities and recreation is a useful time-management skill."
+            },
+
+            {
+                text:
+                "Never take any breaks",
+
+                xp: 10,
+
+                message:
+                "Rest and recreation are also important. Good planning includes both work and breaks."
+            }
+
+        ]
+
+    },
+
+
+    team: {
+
+        title: "🤝 Teamwork Challenge",
+
+        question:
+        "Your team disagrees about how to complete a project. What should you do?",
+
+        choices: [
+
+            {
+                text:
+                "Tell everyone your idea is the only good one",
+
+                xp: 5,
+
+                message:
+                "Good teamwork involves listening to different ideas."
+            },
+
+            {
+                text:
+                "Listen to everyone and work toward a shared solution",
+
+                xp: 25,
+
+                message:
+                "Excellent! Listening and cooperation are key teamwork skills."
+            },
+
+            {
+                text:
+                "Leave the project to everyone else",
+
+                xp: 5,
+
+                message:
+                "A strong team member contributes and communicates."
+            }
+
+        ]
+
+    },
+
+
+    mind: {
+
+        title: "🧠 Mindset Challenge",
+
+        question:
+        "You make a mistake while learning something new. What should you do?",
+
+        choices: [
+
+            {
+                text:
+                "Give up immediately",
+
+                xp: 5,
+
+                message:
+                "Mistakes are a normal part of learning."
+            },
+
+            {
+                text:
+                "Learn from the mistake and try again",
+
+                xp: 25,
+
+                message:
+                "Excellent! Learning from mistakes helps build resilience and a growth mindset."
+            },
+
+            {
+                text:
+                "Pretend the mistake never happened",
+
+                xp: 5,
+
+                message:
+                "Recognizing mistakes can help you learn and improve."
+            }
+
+        ]
+
+    }
+
+};
+
+
+/* =========================
+   OPEN CHALLENGE
+========================= */
+
+function openChallenge(type) {
+
+    const challenge =
+        challenges[type];
+
+    document.getElementById("modalTitle")
+        .textContent =
+        challenge.title;
+
+    document.getElementById("question")
+        .textContent =
+        challenge.question;
+
+
+    const choices =
+        document.getElementById("choices");
+
+    choices.innerHTML = "";
+
+
+    challenge.choices.forEach(
+        function(choice) {
+
+            const button =
+                document.createElement("button");
+
+            button.className =
+                "choice";
+
+            button.textContent =
+                choice.text;
+
+
+            button.onclick =
+                function() {
+
+                    addXP(choice.xp);
+
+                    document.getElementById("question")
+                        .textContent =
+                        choice.message;
+
+                    choices.innerHTML =
+                    `<button
+                        class="choice"
+                        onclick="closeModal()">
+                        Continue Exploring
+                    </button>`;
+
+                };
+
+
+            choices.appendChild(button);
+
+        }
+    );
+
+
+    document.getElementById("modal")
+        .style.display = "flex";
+
+}
+
+
+/* =========================
+   CLOSE
+========================= */
+
+function closeModal() {
+
+    document.getElementById("modal")
+        .style.display = "none";
+
+}
+
+</script>
+
+
+</body>
+</html>
